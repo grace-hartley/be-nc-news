@@ -19,7 +19,6 @@ describe("/api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        // console.log(body);
         expect(body.topics).toBeInstanceOf(Array);
         body.topics.forEach((topic) => {
           expect(typeof topic.slug).toBe("string");
@@ -33,6 +32,30 @@ describe("/api/topics", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("path does not exist");
+      });
+  });
+});
+
+describe("/api", () => {
+  test("GET: 200 sends object describing all available endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(typeof body).toBe("object");
+
+        expect(body["GET /api"].hasOwnProperty("description")).toBe(true);
+
+        const endpointKeysArray = Object.keys(body);
+
+        endpointKeysArray.forEach((endpointKey) => {
+          if (endpointKey !== "GET /api") {
+            const endpoint = body[endpointKey];
+            expect(endpoint.hasOwnProperty("description")).toBe(true);
+            expect(endpoint.hasOwnProperty("queries")).toBe(true);
+            expect(endpoint.hasOwnProperty("exampleResponse")).toBe(true);
+          }
+        });
       });
   });
 });
