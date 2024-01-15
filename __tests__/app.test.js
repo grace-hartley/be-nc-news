@@ -8,6 +8,7 @@ const {
   topicData,
   userData,
 } = require("../db/data/test-data/index");
+const endpoints = require("../endpoints.json");
 
 beforeEach(() => seed({ articleData, commentData, topicData, userData }));
 
@@ -43,6 +44,7 @@ describe("/api", () => {
       .expect(200)
       .then(({ body }) => {
         expect(typeof body).toBe("object");
+        expect(body).toEqual(endpoints);
 
         expect(body["GET /api"].hasOwnProperty("description")).toBe(true);
 
