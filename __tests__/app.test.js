@@ -117,14 +117,58 @@ describe("GET /api/articles", () => {
           expect(typeof article.created_at).toBe("string");
           expect(typeof article.votes).toBe("number");
           expect(article.body).toBe(undefined);
-          expect(typeof article.comment_count).toBe("number");
+          expect(typeof article.comment_count).toBe("string");
         });
       });
   });
-  // I know this is the same test as Q2 but can't think what other errors would apply here?
+});
+
+// QUESTION 6
+describe("/api/articles/:article_id/comments", () => {
+  test("GET: 200 sends an array of comments for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(11);
+        body.comments.forEach((comment) => {
+          expect(typeof comment.comment_id).toBe("number");
+          expect(typeof comment.votes).toBe("number");
+          expect(typeof comment.created_at).toBe("string");
+          expect(typeof comment.author).toBe("string");
+          expect(typeof comment.body).toBe("string");
+          expect(typeof comment.article_id).toBe("number");
+        });
+      });
+  });
+  test("GET: 200 sends an empty array for the given article_id where there are no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments.length).toBe(0);
+        expect(body.comments).toEqual([]);
+      });
+  });
+  test("GET: 404 sends status and error message when given a valid but non-existent id", () => {
+    return request(app)
+      .get("/api/articles/999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("article does not exist");
+      });
+  });
+  test("GET: 400 sends status and error message when given an invalid id", () => {
+    return request(app)
+      .get("/api/articles/notAnArticle/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
   test("GET: 404 when given invalid path", () => {
     return request(app)
-      .get("/api/notArticles")
+      .get("/api/articles/1/notComments")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("path does not exist");
