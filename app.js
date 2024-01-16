@@ -4,6 +4,7 @@ const { getApi } = require("./controllers/api.controller");
 const {
   getArticleById,
   getArticles,
+  getArticleComments,
 } = require("./controllers/articles.controller");
 
 const app = express();
@@ -16,6 +17,8 @@ app.get("/api/articles/:article_id", getArticleById);
 
 app.get("/api/articles", getArticles);
 
+app.get("/api/articles/:article_id/comments", getArticleComments);
+
 // Error handling
 
 app.all("*", (req, res) => {
@@ -25,13 +28,7 @@ app.all("*", (req, res) => {
 app.use((err, req, res, next) => {
   if (err.msg === "Not Found") {
     res.status(404).send({ msg: "article does not exist" });
-  } else {
-    next(err);
-  }
-});
-
-app.use((err, req, res, next) => {
-  if (err.code === "22P02") {
+  } else if (err.code === "22P02") {
     res.status(400).send({ msg: "Bad Request" });
   } else {
     next(err);
