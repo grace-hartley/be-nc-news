@@ -100,3 +100,34 @@ describe("/api/articles/:article_id", () => {
       });
   });
 });
+
+// QUESTION 5
+describe("GET /api/articles", () => {
+  test("GET: 200 sends an array of articles", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(articleData.length);
+        body.articles.forEach((article) => {
+          expect(typeof article.author).toBe("string");
+          expect(typeof article.title).toBe("string");
+          expect(typeof article.article_id).toBe("number");
+          expect(typeof article.topic).toBe("string");
+          expect(typeof article.created_at).toBe("string");
+          expect(typeof article.votes).toBe("number");
+          expect(article.body).toBe(undefined);
+          expect(typeof article.comment_count).toBe("number");
+        });
+      });
+  });
+  // I know this is the same test as Q2 but can't think what other errors would apply here?
+  test("GET: 404 when given invalid path", () => {
+    return request(app)
+      .get("/api/notArticles")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("path does not exist");
+      });
+  });
+});
