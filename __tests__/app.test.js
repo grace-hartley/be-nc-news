@@ -102,7 +102,7 @@ describe("/api/articles/:article_id", () => {
 });
 
 // QUESTION 5
-describe("GET /api/articles", () => {
+describe("/api/articles", () => {
   test("GET: 200 sends an array of articles", () => {
     return request(app)
       .get("/api/articles")
@@ -348,6 +348,23 @@ describe("/api/comments/:comment_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad Request");
+      });
+  });
+});
+
+// QUESTION 10
+describe("/api/users", () => {
+  test("GET: 200 sends an array of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users.length).toBe(userData.length);
+        body.users.forEach((user) => {
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
       });
   });
 });
