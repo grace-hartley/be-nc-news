@@ -175,3 +175,38 @@ describe("/api/articles/:article_id/comments", () => {
       });
   });
 });
+
+// QUESTION 7
+
+describe("/api/articles/:article_id/comments", () => {
+  test("POST: 201 should respond with status and inserted comment", () => {
+    const commentToSend = {
+      username: "butter_bridge",
+      body: "This is a new comment",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(commentToSend)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment.article_id).toBe(2);
+        expect(body.comment.comment_id).toBe(19);
+        expect(body.comment.author).toBe("butter_bridge");
+        expect(body.comment.body).toBe("This is a new comment");
+        expect(body.comment.votes).toBe(0);
+        expect(typeof body.comment.created_at).toBe("string");
+      });
+  });
+  test("POST: 400 sends status and error message when given an invalid format of comment to send", () => {
+    const commentToSend = {
+      username: "butter_bridge",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(commentToSend)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+});
