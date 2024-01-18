@@ -197,7 +197,20 @@ describe("/api/articles/:article_id/comments", () => {
         expect(typeof body.comment.created_at).toBe("string");
       });
   });
-  test("POST: 400 sends status and error message when given an invalid format of comment to send", () => {
+  test("POST: 404 sends status and error message when given non-existent username provided", () => {
+    const commentToSend = {
+      username: "grace",
+      body: "This is a new comment",
+    };
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(commentToSend)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("username does not exist");
+      });
+  });
+  test("POST: 400 sends status and error message when given no body key to send", () => {
     const commentToSend = {
       username: "butter_bridge",
     };
@@ -207,6 +220,104 @@ describe("/api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("POST: 400 sends status and error message when given an invalid id", () => {
+    const commentToSend = {
+      username: "butter_bridge",
+      body: "This is a new comment",
+    };
+    return request(app)
+      .post("/api/articles/notAnArticle/comments")
+      .send(commentToSend)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("POST: 404 when given invalid endpoint", () => {
+    const commentToSend = {
+      username: "butter_bridge",
+      body: "This is a new comment",
+    };
+    return request(app)
+      .post("/api/articles/1/notComments")
+      .send(commentToSend)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("path does not exist");
+      });
+  });
+  test("POST: 404 sends status and error message when given a valid but non-existent id", () => {
+    return request(app)
+      .get("/api/articles/999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("article does not exist");
+      });
+  });
+});
+
+// QUESTION 8
+describe("/api/articles/:article_id", () => {
+  test("PATCH: 200 responds with updated article with the votes incremented", () => {
+    const patchToSend = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/articles/2")
+      .send(patchToSend)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article.votes).toBe(1);
+      });
+  });
+  test("PATCH: 200 responds with updated article with the votes incremented", () => {
+    const patchToSend = { inc_votes: -25 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(patchToSend)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article.votes).toBe(75);
+      });
+  });
+  test("PATCH: 400 sends status and error message when given no inc_votes key to send", () => {
+    const patchToSend = {};
+    return request(app)
+      .patch("/api/articles/2")
+      .send(patchToSend)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("PATCH: 400 sends status and error message when given incorrect key", () => {
+    const patchToSend = { votes: 100 };
+    return request(app)
+      .patch("/api/articles/2")
+      .send(patchToSend)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("PATCH: 400 sends status and error message when given inc_votes value provided in invalid format", () => {
+    const patchToSend = { inc_votes: "hello" };
+    return request(app)
+      .patch("/api/articles/2")
+      .send(patchToSend)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("PATCH: 404 sends status and error message when given a valid but non-existent id", () => {
+    const patchToSend = { votes: 100 };
+    return request(app)
+      .patch("/api/articles/999")
+      .send(patchToSend)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("article does not exist");
       });
   });
 });

@@ -4,6 +4,7 @@ const {
   findArticles,
   findArticleComments,
   insertComment,
+  updateArticle,
 } = require("../models/articles.model");
 
 exports.getArticleById = (req, res, next) => {
@@ -54,6 +55,27 @@ exports.addComment = (req, res, next) => {
   insertComment({ article_id, username, body })
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+
+  const updateArticleQuery = updateArticle({ article_id, inc_votes });
+  const queries = [updateArticleQuery];
+
+  if (article_id) {
+    const idExistenceQuery = checkArticleIdExists(article_id);
+    queries.push(idExistenceQuery);
+  }
+
+  Promise.all(queries)
+    .then(([updatedArticle, idExistence]) => {
+      res.status(200).send({ article: updatedArticle });
     })
     .catch((err) => {
       next(err);
