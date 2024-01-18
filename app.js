@@ -6,6 +6,7 @@ const {
   getArticles,
   getArticleComments,
   addComment,
+  patchArticle,
 } = require("./controllers/articles.controller");
 
 const app = express();
@@ -24,6 +25,8 @@ app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.post("/api/articles/:article_id/comments", addComment);
 
+app.patch("/api/articles/:article_id", patchArticle);
+
 // Error handling
 
 app.all("*", (req, res) => {
@@ -35,6 +38,8 @@ app.use((err, req, res, next) => {
     res.status(404).send({ msg: "article does not exist" });
   } else if (err.code === "22P02" || err.code === "23502") {
     res.status(400).send({ msg: "Bad Request" });
+  } else if (err.code === "23503") {
+    res.status(404).send({ msg: "username does not exist" });
   } else {
     next(err);
   }
