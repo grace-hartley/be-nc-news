@@ -8,6 +8,7 @@ const {
   addComment,
   patchArticle,
 } = require("./controllers/articles.controller");
+const { deleteCommentById } = require("./controllers/comments.controller");
 
 const app = express();
 
@@ -27,6 +28,8 @@ app.post("/api/articles/:article_id/comments", addComment);
 
 app.patch("/api/articles/:article_id", patchArticle);
 
+app.delete("/api/comments/:comment_id", deleteCommentById);
+
 // Error handling
 
 app.all("*", (req, res) => {
@@ -34,8 +37,11 @@ app.all("*", (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.msg === "Not Found") {
-    res.status(404).send({ msg: "article does not exist" });
+  if (err.msg === "Article Not Found") {
+    res.status(404).send({ msg: "Article does not exist" });
+  }
+  if (err.msg === "Comment Not Found") {
+    res.status(404).send({ msg: "Comment does not exist" });
   } else if (err.code === "22P02" || err.code === "23502") {
     res.status(400).send({ msg: "Bad Request" });
   } else if (err.code === "23503") {
