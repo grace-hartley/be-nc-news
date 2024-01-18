@@ -88,7 +88,7 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/999")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("article does not exist");
+        expect(body.msg).toBe("Article does not exist");
       });
   });
   test("GET: 400 sends status and error message when given an invalid id", () => {
@@ -155,7 +155,7 @@ describe("/api/articles/:article_id/comments", () => {
       .get("/api/articles/999/comments")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("article does not exist");
+        expect(body.msg).toBe("Article does not exist");
       });
   });
   test("GET: 400 sends status and error message when given an invalid id", () => {
@@ -253,7 +253,7 @@ describe("/api/articles/:article_id/comments", () => {
       .get("/api/articles/999/comments")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("article does not exist");
+        expect(body.msg).toBe("Article does not exist");
       });
   });
 });
@@ -268,6 +268,13 @@ describe("/api/articles/:article_id", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.article.votes).toBe(1);
+        expect(body.article.article_id).toBe(2);
+        expect(typeof body.article.author).toBe("string");
+        expect(typeof body.article.title).toBe("string");
+        expect(typeof body.article.body).toBe("string");
+        expect(typeof body.article.topic).toBe("string");
+        expect(body.article.hasOwnProperty("created_at")).toBe(true);
+        expect(typeof body.article.article_img_url).toBe("string");
       });
   });
   test("PATCH: 200 responds with updated article with the votes incremented", () => {
@@ -317,7 +324,30 @@ describe("/api/articles/:article_id", () => {
       .send(patchToSend)
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("article does not exist");
+        expect(body.msg).toBe("Article does not exist");
+      });
+  });
+});
+
+// QUESTION 9
+describe("/api/comments/:comment_id", () => {
+  test("DELETE: 204 responds with status and no content", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("DELETE: 404 sends status and error message when given a valid but non-existent id", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Comment does not exist");
+      });
+  });
+  test("DELETE: 400 sends status and error message when given an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/notAComment")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
       });
   });
 });
