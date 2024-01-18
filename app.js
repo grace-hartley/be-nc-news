@@ -9,6 +9,7 @@ const {
   patchArticle,
 } = require("./controllers/articles.controller");
 const { deleteCommentById } = require("./controllers/comments.controller");
+const { getUsers } = require("./controllers/users.controller");
 
 const app = express();
 
@@ -29,6 +30,8 @@ app.post("/api/articles/:article_id/comments", addComment);
 app.patch("/api/articles/:article_id", patchArticle);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
+
+app.get("/api/users", getUsers);
 
 // Error handling
 
