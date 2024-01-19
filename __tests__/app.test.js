@@ -368,3 +368,33 @@ describe("/api/users", () => {
       });
   });
 });
+
+// QUESTION 11
+describe("/api/articles (topic query)", () => {
+  test("QUERY: filters the articles by the specified topic when provided", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(1);
+        body.articles.forEach((article) => {
+          expect(typeof article.author).toBe("string");
+          expect(typeof article.title).toBe("string");
+          expect(typeof article.article_id).toBe("number");
+          expect(typeof article.topic).toBe("string");
+          expect(typeof article.created_at).toBe("string");
+          expect(typeof article.votes).toBe("number");
+          expect(article.body).toBe(undefined);
+          expect(typeof article.comment_count).toBe("string");
+        });
+      });
+  });
+  test("QUERY: 400 if invalid topic value provided", () => {
+    return request(app)
+      .get("/api/articles?topic=dogs")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Topic Not Found");
+      });
+  });
+});

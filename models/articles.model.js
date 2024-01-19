@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { findTopics } = require("./topics.model");
 
 exports.findArticleById = (article_id) => {
   return db
@@ -11,18 +12,24 @@ exports.findArticleById = (article_id) => {
     });
 };
 
-exports.findArticles = () => {
-  return db
-    .query(
-      `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count 
-      FROM articles 
-      LEFT JOIN comments ON articles.article_id = comments.article_id 
-      GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url 
-      ORDER BY created_at DESC`
-    )
-    .then((result) => {
-      return result.rows;
-    });
+exports.findArticles = (topic) => {
+  const queryValues = [];
+
+  let queryStr = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.comment_id) AS comment_count 
+  FROM articles 
+  LEFT JOIN comments ON articles.article_id = comments.article_id`;
+
+  if (topic) {
+    queryStr += ` WHERE articles.topic = $1`;
+    queryValues.push(topic);
+  }
+
+  queryStr += ` GROUP BY articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url 
+  ORDER BY created_at DESC`;
+
+  return db.query(queryStr, queryValues).then((result) => {
+    return result.rows;
+  });
 };
 
 exports.findArticleComments = (article_id) => {
