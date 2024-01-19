@@ -45,6 +45,8 @@ app.use((err, req, res, next) => {
   }
   if (err.msg === "Comment Not Found") {
     res.status(404).send({ msg: "Comment does not exist" });
+  } else if (err.msg === "Topic Not Found") {
+    res.status(400).send({ msg: "Topic Not Found" });
   } else if (err.code === "22P02" || err.code === "23502") {
     res.status(400).send({ msg: "Bad Request" });
   } else if (err.code === "23503") {

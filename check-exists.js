@@ -9,3 +9,13 @@ exports.checkArticleIdExists = (article_id) => {
       }
     });
 };
+
+exports.checkTopicsExists = (topic) => {
+  return db
+    .query(`SELECT articles.topic FROM articles WHERE topic = $1`, [topic])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({ msg: "Topic Not Found" });
+      }
+    });
+};

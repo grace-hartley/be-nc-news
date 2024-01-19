@@ -1,4 +1,4 @@
-const { checkArticleIdExists } = require("../check-exists");
+const { checkArticleIdExists, checkTopicsExists } = require("../check-exists");
 const {
   findArticleById,
   findArticles,
@@ -19,8 +19,18 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  findArticles()
-    .then((articles) => {
+  const { topic } = req.query;
+
+  const findArticlesQuery = findArticles(topic);
+  const queries = [findArticlesQuery];
+
+  if (topic) {
+    const topicExistenceQuery = checkTopicsExists(topic);
+    queries.push(topicExistenceQuery);
+  }
+
+  Promise.all(queries)
+    .then(([articles, topicExists]) => {
       res.status(200).send({ articles });
     })
     .catch((err) => {
