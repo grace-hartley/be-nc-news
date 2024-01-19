@@ -378,6 +378,7 @@ describe("/api/articles (topic query)", () => {
       .then(({ body }) => {
         expect(body.articles.length).toBe(1);
         body.articles.forEach((article) => {
+          expect(article.topic).toBe("cats");
           expect(typeof article.author).toBe("string");
           expect(typeof article.title).toBe("string");
           expect(typeof article.article_id).toBe("number");
@@ -389,12 +390,40 @@ describe("/api/articles (topic query)", () => {
         });
       });
   });
-  test("QUERY: 400 if invalid topic value provided", () => {
+  test("QUERY: 404 if invalid topic value provided", () => {
     return request(app)
       .get("/api/articles?topic=dogs")
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Topic Not Found");
+      });
+  });
+  test("QUERY:200 gives empty array if valid topic with no associated artciles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toEqual([]);
+      });
+  });
+});
+
+// QUESTION 12
+describe("/api/articles/:article_id (comment_count)", () => {
+  test("GET: 200 expect output article to include comment count", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article.comment_count).toBe("11");
+      });
+  });
+  test("GET: 200 expect output article to include comment count = 0 when there are no associated comments", () => {
+    return request(app)
+      .get("/api/articles/2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article.comment_count).toBe("0");
       });
   });
 });
